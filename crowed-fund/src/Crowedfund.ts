@@ -10,6 +10,7 @@ import {
   PublicKey,
   UInt32,
   Bool,
+  Provable,
 } from 'o1js';
 export const MINA = 1e9;
 export class Crowedfund extends SmartContract {
@@ -57,10 +58,12 @@ export class Crowedfund extends SmartContract {
     const currentBlockHeight = this.network.blockchainLength.getAndRequireEquals();
     currentBlockHeight.assertGreaterThan(endAt, 'No ended');
 
+    const recieverAcctUpt = AccountUpdate.createSigned(reciver);
+    recieverAcctUpt.account.isNew.requireEquals(Bool(true));
+
     const balance = this.account.balance.getAndRequireEquals();
     const item = balance.div(10);
 
-    const recieverAcctUpt = AccountUpdate.createSigned(reciver);
     this.send({ to: recieverAcctUpt, amount: balance });
 
     recieverAcctUpt.account.timing.set({
